@@ -158,8 +158,26 @@ def index_all_policies(
     Returns:
         int: Total number of chunks indexed.
     """
+    from backend.db.store import add_policy_version
+    from datetime import datetime, timezone
+    
     target_dir = policies_dir or os.getenv("POLICIES_DIR", POLICIES_DIR)
     docs = load_all_policies(policies_dir=target_dir)
+    
+    # Save to SQLite DB
+    now = datetime.now(timezone.utc).isoformat()
+    from pathlib import Path
+    for doc in docs:
+        file_path = Path(target_dir) / (doc.metadata.name + ".md")
+        text = file_path.read_text(encoding="utf-8") if file_path.exists() else ""
+        add_policy_version(
+            doc.metadata.name + ".md", 
+            doc.metadata.version, 
+            text, 
+            doc.metadata.effective_date, 
+            now
+        )
+        
     return index_policy_documents(documents=docs, collection=collection)
 
 

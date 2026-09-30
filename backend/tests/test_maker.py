@@ -286,3 +286,27 @@ def test_correct_draft_filters_evidence():
     assert "Cited chunk 99 days." in prompt
     assert "Unrelated chunk 1." in prompt
     assert "Unrelated chunk 2." not in prompt
+
+def test_correct_draft_rejects_made_up_numbers():
+    from backend.agents.maker import correct_draft
+    from backend.contracts import Claim, Evidence
+    
+    # Fake client returns ₹499 twice.
+    # Neither evidence nor question contains 499.
+    bad_fake = _fake_response(response="The restocking fee is \u20b9499.")
+    mock_client = MagicMock()
+    mock_client.generate.side_effect = [bad_fake, bad_fake]
+    
+    ev1 = Evidence(source="p.md", version="v1", text="The restocking fee is \u20b9250.", chunk_id="1")
+    c = Claim(
+        id=1, text="bad claim", start=0, end=9,
+        status="CONTRADICTED", checked_by="llm", reason="nope", evidence=[ev1]
+    )
+    
+    with patch("backend.agents.maker._build_client", return_value=mock_client):
+        draft, tokens = correct_draft("question without numbers", "old draft", [c], [ev1])
+        
+    assert mock_client.generate.call_count == 2
+    # Should fallback to verbatim since 499 is not allowed
+    assert draft == "The restocking fee is \u20b9250."
+    assert tokens.get("fallback") == 1

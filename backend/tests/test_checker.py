@@ -135,3 +135,22 @@ def test_deterministic_check_exact_match():
     assert res.status == "SUPPORTED"
     assert res.reason == "Exact match with policy chunk."
     assert res.evidence == [ev]
+
+def test_bug2_restocking_fee_supported_or_unresolved():
+    c = create_claim("Opened headphones can be returned within 10 days of delivery, but a restocking fee of ₹250 applies to such returns.")
+    ev2 = Evidence(source="refund_policy.md", version="v1", chunk_id="refund_policy.md#2", text="Opened electronics can be returned within 10 days.")
+    ev4 = Evidence(source="refund_policy.md", version="v1", chunk_id="refund_policy.md#4", text="A restocking fee of ₹250 applies to opened electronics returns.")
+    ev8 = Evidence(source="refund_policy.md", version="v1", chunk_id="refund_policy.md#8", text="Return shipping costs ₹99.")
+    res = deterministic_check(c, [ev2, ev4, ev8], "")
+    assert res is None or res.status != "CONTRADICTED"
+
+def test_bug2_restocking_fee_contradicted_cites_4():
+    c = create_claim("Opened headphones can be returned within 10 days of delivery, but a restocking fee of ₹499 applies to such returns.")
+    ev2 = Evidence(source="refund_policy.md", version="v1", chunk_id="refund_policy.md#2", text="Opened electronics can be returned within 10 days.")
+    ev4 = Evidence(source="refund_policy.md", version="v1", chunk_id="refund_policy.md#4", text="A restocking fee of ₹250 applies to opened electronics returns.")
+    ev8 = Evidence(source="refund_policy.md", version="v1", chunk_id="refund_policy.md#8", text="Return shipping costs ₹99.")
+    res = deterministic_check(c, [ev2, ev4, ev8], "")
+    assert res is not None
+    assert res.status == "CONTRADICTED"
+    assert len(res.evidence) == 1
+    assert res.evidence[0].chunk_id == "refund_policy.md#4"

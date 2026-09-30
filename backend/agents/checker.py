@@ -99,10 +99,14 @@ def get_keywords(text: str) -> set[str]:
             keywords.add(w)
     return keywords
 
-def share_topic(claim_text: str, ev_text: str) -> bool:
+def share_topic(claim_text: str, ev_text: str, kind: str = "") -> bool:
     c_kw = get_keywords(claim_text)
     e_kw = get_keywords(ev_text)
-    return len(c_kw & e_kw) > 0
+    overlap = c_kw & e_kw
+    if kind == "price":
+        generic_kws = {"return", "polic", "apply", "item", "product", "order", "purchase", "day", "month", "year", "week", "hour", "within", "such", "refund", "allow", "delivery", "charge", "cost", "take"}
+        return len(overlap - generic_kws) > 0
+    return len(overlap) > 0
 
 def overlap_ratio(claim_text: str, ev_text: str) -> float:
     c_kw = get_keywords(claim_text)
@@ -162,13 +166,15 @@ def deterministic_check(claim: ClaimSpan, evidence: list[Evidence], question: st
     for cq in non_echo_c_quants:
         found_exact = None
         contradicting_ev = None
+        has_claimed_value = False
         
         for ev in evidence:
             e_quants = extract_quantities(ev.text)
             for eq in e_quants:
                 if eq['kind'] == cq['kind'] and eq['family'] == cq['family']:
-                    if share_topic(relevant_claim_text, ev.text):
+                    if share_topic(relevant_claim_text, ev.text, cq['kind']):
                         if eq['value'] == cq['value']:
+                            has_claimed_value = True
                             if overlap_ratio(relevant_claim_text, ev.text) >= config.DET_SUPPORT_OVERLAP:
                                 found_exact = ev
                         else:
@@ -178,7 +184,7 @@ def deterministic_check(claim: ClaimSpan, evidence: list[Evidence], question: st
             supporting_evidence.append(found_exact)
         else:
             has_support_for_all = False
-            if contradicting_ev:
+            if contradicting_ev and not has_claimed_value:
                 return Claim(
                     id=claim.id, text=claim.text, start=claim.start, end=claim.end,
                     status="CONTRADICTED", checked_by="deterministic", 

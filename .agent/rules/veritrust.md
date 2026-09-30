@@ -18,7 +18,7 @@ Areas: `backend/agents/` (A), `backend/graph/` + `backend/api/` + `backend/contr
 
 ## 3. Tech stack (fixed, do not swap)
 
-- Backend: Python 3.11+, FastAPI, LangGraph, Pydantic v2, ChromaDB, SQLite, `ollama` Python client.
+- Backend: Python 3.11+, FastAPI, uvicorn, python-dotenv, httpx, pytest-asyncio, LangGraph, Pydantic v2, ChromaDB, SQLite, `ollama` Python client.
 - Frontend: Next.js (App Router), TypeScript, Tailwind, Framer Motion, `diff-match-patch`, one chart lib (Recharts) for a single line chart.
 - LLMs: **Ollama local only.** Never call OpenAI, Anthropic, Google or any paid or keyed API. No API keys anywhere in the repo.
 - Model names, hosts and URLs come from env vars (`MAKER_MODEL`, `JUDGE_MODEL`, `EMBED_MODEL`, `OLLAMA_HOST`, `NEXT_PUBLIC_API_URL`). Never hardcode `127.0.0.1`, ports or model names in logic.

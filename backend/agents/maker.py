@@ -296,12 +296,18 @@ def correct_draft(
         lt = t.lower()
         if "i cannot" in lt or "unable" in lt:
             return False
+            
         ev_text = " ".join(e.text for e in cited_evidence)
         ev_nums = set(_re.findall(r"\d+", ev_text))
-        if ev_nums:
-            t_nums = set(_re.findall(r"\d+", t))
-            if not (ev_nums & t_nums):
-                return False
+        t_nums = set(_re.findall(r"\d+", t))
+        
+        if ev_nums and not (ev_nums & t_nums):
+            return False
+            
+        allowed_nums = ev_nums | set(_re.findall(r"\d+", question))
+        if t_nums - allowed_nums:
+            return False
+            
         return True
 
     text = ""
