@@ -227,3 +227,8 @@ node_modules/
 .next/
 generate_mocks.py
 .env.example
+# Local environment
+frontend/.env.local
+
+# TypeScript build cache
+frontend/tsconfig.tsbuildinfo

@@ -142,3 +142,151 @@ export interface MockScenarios {
     abstained: ServerEvent[];
   };
 }
+
+// Phase 11 Endpoint Contract Types
+
+export interface RunRow {
+  run_id: string;
+  question: string;
+  final_status: FinalStatus;
+  chaos: boolean;
+  source: "live" | "benchmark";
+  created_at: string;
+  total_ms: number;
+  stale: boolean;
+}
+
+export interface MetricsDriftPoint {
+  window_end: string;
+  first_pass_clean_rate: number;
+  runs: number;
+}
+
+export interface PolicyChangeMarker {
+  name: string;
+  from: string;
+  to: string;
+  at: string;
+}
+
+export interface MetricsResult {
+  answers_checked: number;
+  wrong_drafts: number;
+  delivered_clean: number;
+  corrected: number;
+  abstained: number;
+  chaos_runs: number;
+  grounding_rate: number | null;
+  first_pass_clean_rate: number | null;
+  drift: MetricsDriftPoint[];
+  policy_changes: PolicyChangeMarker[];
+  latency_ms: {
+    retrieve: number;
+    maker: number;
+    check: number;
+    judge: number;
+    correct: number;
+    total: number;
+  };
+  tokens: {
+    maker: number;
+    judge: number;
+  };
+}
+
+export interface PolicySummary {
+  name: string;
+  version: string;
+  effective_date: string;
+  updated_at: string;
+}
+
+export interface PolicyDetail {
+  name: string;
+  version: string;
+  text: string;
+}
+
+export interface PolicyUpdateResult {
+  name: string;
+  version: string;
+  stale_run_ids: string[];
+}
+
+// Phase 11 Step 3: Benchmark & Gauntlet Contracts (PRD Sections 10, 12, 13)
+
+export type BenchmarkCategory =
+  | "direct"
+  | "paraphrased"
+  | "multi_part"
+  | "false_premise"
+  | "unanswerable"
+  | string;
+
+export type BenchmarkExpectedBehavior = "ANSWER" | "ABSTAIN";
+
+export interface BenchmarkCaseResult {
+  case_id: string;
+  category: BenchmarkCategory;
+  question: string;
+  expected_behavior: BenchmarkExpectedBehavior;
+  expected_facts?: string[];
+  forbidden_facts?: string[];
+  actual_status?: FinalStatus;
+  actual_answer?: string;
+  pass: boolean;
+  latency_ms?: number;
+  run_id?: string;
+  mode?: "normal" | "chaos";
+  draft?: string;
+  final_draft?: string;
+  retries?: number;
+  outcome?: string;
+}
+
+export interface BenchmarkSummary {
+  id?: number | string;
+  started_at: string;
+  finished_at?: string;
+  modes: ("normal" | "chaos" | string)[];
+  total_cases: number;
+  completed_cases: number;
+  passed_cases: number;
+  failed_cases: number;
+  detection_rate: number | null;
+  false_approval_rate: number | null;
+  correct_abstention_rate: number | null;
+  correction_success_rate: number | null;
+  over_abstention_rate?: number | null;
+  baseline_accuracy?: number | null;
+  veritrust_accuracy?: number | null;
+  cases?: BenchmarkCaseResult[];
+}
+
+export type BenchmarkStreamEvent =
+  | {
+      event: "benchmark_started";
+      data: {
+        total_cases?: number;
+        mode?: string;
+        modes?: string[];
+        started_at?: string;
+      };
+    }
+  | {
+      event: "benchmark_case";
+      data: BenchmarkCaseResult;
+    }
+  | {
+      event: "benchmark_summary";
+      data: BenchmarkSummary;
+    }
+  | {
+      event: "error";
+      data: {
+        code: string;
+        message: string;
+      };
+    };
+
+

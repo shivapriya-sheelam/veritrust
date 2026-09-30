@@ -40,3 +40,50 @@
   direction: ltr;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Editorial Tracked Changes signature animation (PRD Section 14) */
+@keyframes strikeDraft {
+  0% {
+    text-decoration-color: transparent;
+    opacity: 0.7;
+  }
+  100% {
+    text-decoration-color: currentColor;
+    opacity: 1;
+  }
+}
+
+@keyframes revealInsertion {
+  0% {
+    opacity: 0;
+    transform: translateY(2px);
+    background-color: rgba(16, 185, 129, 0.3);
+    border-color: rgba(16, 185, 129, 0.6);
+  }
+  50% {
+    opacity: 0.85;
+    background-color: rgba(16, 185, 129, 0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    background-color: #ecfdf5;
+  }
+}
+
+.animate-strike-through {
+  animation: strikeDraft 0.3s ease-out both;
+}
+
+.animate-insert-reveal {
+  animation: revealInsertion 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-strike-through,
+  .animate-insert-reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

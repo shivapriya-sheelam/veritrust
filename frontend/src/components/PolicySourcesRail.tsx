@@ -1,18 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { PolicyDocument } from "@/types/policy";
+import { PolicySummary } from "@/types/contracts";
 
 interface PolicySourcesRailProps {
-  policies: PolicyDocument[];
-  selectedPolicyId: string;
-  onSelectPolicy: (id: string) => void;
+  policies: PolicySummary[];
+  selectedPolicyName: string | null;
+  onSelectPolicy: (name: string) => void;
+  loading?: boolean;
 }
 
 export const PolicySourcesRail: React.FC<PolicySourcesRailProps> = ({
   policies,
-  selectedPolicyId,
+  selectedPolicyName,
   onSelectPolicy,
+  loading = false,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -20,8 +22,8 @@ export const PolicySourcesRail: React.FC<PolicySourcesRailProps> = ({
     const term = searchTerm.toLowerCase();
     return (
       p.name.toLowerCase().includes(term) ||
-      p.summary.toLowerCase().includes(term) ||
-      p.version.toLowerCase().includes(term)
+      p.version.toLowerCase().includes(term) ||
+      (p.effective_date && p.effective_date.toLowerCase().includes(term))
     );
   });
 
@@ -31,8 +33,8 @@ export const PolicySourcesRail: React.FC<PolicySourcesRailProps> = ({
         <span className="font-mono text-[10px] uppercase tracking-wider text-outline font-semibold">
           Policy Sources
         </span>
-        <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-surface-muted text-on-surface-variant">
-          {policies.length} Registered
+        <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-surface-muted text-on-surface-variant font-medium">
+          {loading ? "Loading..." : `${policies.length} Registered`}
         </span>
       </div>
 
@@ -45,67 +47,71 @@ export const PolicySourcesRail: React.FC<PolicySourcesRailProps> = ({
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Filter source markdown files..."
+          placeholder="Filter policy specifications..."
           className="w-full pl-8 pr-3 py-1.5 bg-surface-muted/60 font-mono text-[11px] text-on-surface rounded placeholder:text-outline focus:outline-none focus:bg-white border border-outline-dim transition-colors"
         />
       </div>
 
       {/* Documents List */}
       <div className="flex flex-col gap-2">
-        {filteredPolicies.map((policy) => {
-          const isSelected = selectedPolicyId === policy.id;
-          return (
+        {loading ? (
+          Array.from({ length: 4 }).map((_, i) => (
             <div
-              key={policy.id}
-              onClick={() => onSelectPolicy(policy.id)}
-              className={`group cursor-pointer p-3 rounded transition-all flex flex-col gap-1 border ${
-                isSelected
-                  ? "bg-surface-muted/70 text-on-surface border-l-2 border-l-accent-ochre border-outline-dim shadow-xs"
-                  : "bg-white hover:bg-surface-muted/30 text-on-surface border-transparent"
-              }`}
+              key={`skeleton-${i}`}
+              className="p-3 rounded border border-outline-dim/60 bg-surface-muted/30 animate-pulse flex flex-col gap-2"
             >
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[12px] font-semibold text-on-surface flex items-center gap-1.5">
+              <div className="h-4 bg-surface-dim rounded w-3/4"></div>
+              <div className="h-3 bg-surface-dim/60 rounded w-1/2"></div>
+            </div>
+          ))
+        ) : filteredPolicies.length === 0 ? (
+          <div className="p-6 text-center font-mono text-[11px] text-outline border border-dashed border-outline-dim rounded">
+            {policies.length === 0 ? "No policies available." : "No matching policies found."}
+          </div>
+        ) : (
+          filteredPolicies.map((policy) => {
+            const isSelected = selectedPolicyName === policy.name;
+            return (
+              <div
+                key={policy.name}
+                onClick={() => onSelectPolicy(policy.name)}
+                className={`group cursor-pointer p-3 rounded transition-all flex flex-col gap-1 border ${
+                  isSelected
+                    ? "bg-surface-muted/70 text-on-surface border-l-2 border-l-accent-ochre border-outline-dim shadow-xs"
+                    : "bg-white hover:bg-surface-muted/30 text-on-surface border-transparent"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[12px] font-semibold text-on-surface flex items-center gap-1.5">
+                    <span
+                      className={`material-symbols-outlined text-[15px] ${
+                        isSelected ? "text-accent-ochre" : "text-outline"
+                      }`}
+                    >
+                      description
+                    </span>
+                    {policy.name}
+                  </span>
                   <span
-                    className={`material-symbols-outlined text-[15px] ${
-                      isSelected ? "text-accent-ochre" : "text-outline"
+                    className={`font-mono text-[10px] px-1.5 py-0.5 rounded font-semibold ${
+                      isSelected
+                        ? "bg-accent-ochre-bg text-accent-ochre border border-accent-ochre-border"
+                        : "bg-surface-muted text-on-surface-variant"
                     }`}
                   >
-                    description
+                    {policy.version}
                   </span>
-                  {policy.name}
-                </span>
-                <span
-                  className={`font-mono text-[10px] px-1.5 py-0.5 rounded font-semibold ${
-                    isSelected
-                      ? "bg-accent-ochre-bg text-accent-ochre border border-accent-ochre-border"
-                      : "bg-surface-muted text-on-surface-variant"
-                  }`}
-                >
-                  ● Current
-                </span>
+                </div>
+
+                <div className="flex items-center justify-between pt-1 mt-0.5 border-t border-surface-dim font-mono text-[10px] text-outline">
+                  <span>Effective: {policy.effective_date || "—"}</span>
+                  <span className={isSelected ? "text-accent-ochre font-medium" : "text-outline"}>
+                    {isSelected ? "Active in Editor" : "View"}
+                  </span>
+                </div>
               </div>
-
-              <p className="font-sans text-[12px] text-on-surface-variant line-clamp-1">
-                {policy.summary}
-              </p>
-
-              <div className="flex items-center justify-between pt-1 mt-0.5 border-t border-surface-dim font-mono text-[10px]">
-                <span className="text-outline">
-                  {policy.version} · {policy.chunksCount} chunks
-                </span>
-                <span className={`${isSelected ? "text-accent-ochre font-medium" : "text-outline"}`}>
-                  {policy.reviewsGroundedCount} reviews grounded
-                </span>
-              </div>
-            </div>
-          );
-        })}
-
-        {filteredPolicies.length === 0 && (
-          <div className="p-4 text-center font-mono text-[11px] text-outline">
-            No matching policies found.
-          </div>
+            );
+          })
         )}
       </div>
 
@@ -116,11 +122,11 @@ export const PolicySourcesRail: React.FC<PolicySourcesRailProps> = ({
             Grounding Knowledge Base
           </span>
           <span className="font-mono text-[10px] text-accent-ochre font-medium">
-            {policies.length} / {policies.length} Active
+            Runtime Authoritative
           </span>
         </div>
         <p className="font-sans text-[11px] text-on-surface-variant leading-relaxed">
-          All production model endpoints reference these authoritative specifications as source truth.
+          All Maker and Judge verification checks reference these active policy specifications as ground truth.
         </p>
       </div>
     </aside>

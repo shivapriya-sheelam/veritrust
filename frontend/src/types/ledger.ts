@@ -40,3 +40,11 @@ export interface TrendPoint {
   cy: number;
   highlight?: "error" | "normal" | "current";
 }
+
+export type {
+  RunRow,
+  MetricsResult,
+  MetricsDriftPoint,
+  PolicyChangeMarker,
+} from "./contracts";
+
