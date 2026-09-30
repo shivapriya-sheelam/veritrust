@@ -18,8 +18,8 @@ export const CustomerQuestion: React.FC<CustomerQuestionProps> = ({ question, is
             <span>Customer Question</span>
           </div>
           {isChaos && (
-            <span className="px-1.5 py-0.5 rounded bg-accent-rose-bg text-accent-rose border border-accent-rose-border text-[9px] font-bold tracking-widest uppercase ml-auto font-mono">
-              SIMULATED
+            <span className="px-2 py-0.5 rounded bg-accent-rose-bg text-accent-rose border border-accent-rose-border text-[9px] font-bold tracking-widest uppercase ml-auto font-mono">
+              Chaos Mode · Simulated Failure
             </span>
           )}
         </div>
@@ -28,13 +28,13 @@ export const CustomerQuestion: React.FC<CustomerQuestionProps> = ({ question, is
         </p>
       </div>
 
-      {/* Simulated failure alert banner (only displayed if Chaos toggled/active) */}
+      {/* Simulated failure alert banner (PRD Section 7.2 & 14) */}
       {isChaos && (
         <div className="p-3 rounded bg-accent-rose-bg/60 border border-accent-rose-border text-[12px] text-accent-rose font-mono transition-all">
           <div className="font-semibold flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[15px] leading-none">error_outline</span>
+            <span className="material-symbols-outlined text-[15px] leading-none">warning</span>
             <span>
-              Simulated Failure Injection: Deprecated policy state detected. Redline arbitration enforced.
+              Simulated failure: Chaos mode instructs the Maker to hallucinate plausible incorrect numbers to verify guardrail enforcement.
             </span>
           </div>
         </div>
