@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Timeline } from "@/components/Timeline";
 import { CustomerQuestion } from "@/components/CustomerQuestion";
@@ -9,8 +10,12 @@ import { EvidenceRail } from "@/components/EvidenceRail";
 import { getScenarioRunResult, ScenarioKey } from "@/lib/mockEvents";
 import { useAsk } from "@/hooks/useAsk";
 import { AskBar } from "@/components/AskBar";
+import { getRun } from "@/lib/api";
 
-export default function ReviewPage() {
+function ReviewContent() {
+  const searchParams = useSearchParams();
+  const runIdParam = searchParams.get("run_id");
+
   const [currentScenario, setCurrentScenario] = useState<ScenarioKey>("corrected");
   const [viewMode, setViewMode] = useState<"reviewer" | "customer">("reviewer");
   const [chaosActive, setChaosActive] = useState<boolean>(true);
@@ -18,8 +23,10 @@ export default function ReviewPage() {
 
   const { run, status, error, ask, currentStage, stageStatuses, resetToResult } = useAsk();
 
-  // Load the initial scenario run result on mount or when scenario changes
+  // Load the initial scenario run result on mount or when scenario changes, unless run_id is supplied
   useEffect(() => {
+    if (runIdParam) return; // Prioritize replayed run if run_id param is active
+
     const mock = getScenarioRunResult(currentScenario);
     resetToResult(mock);
     if (currentScenario === "corrected") {
@@ -32,7 +39,30 @@ export default function ReviewPage() {
       setChaosActive(false);
       setSelectedClaimId("claim-0");
     }
-  }, [currentScenario]);
+  }, [currentScenario, runIdParam]);
+
+  // Handle run replay when run_id query param is present
+  useEffect(() => {
+    if (!runIdParam) return;
+
+    let isMounted = true;
+    getRun(runIdParam)
+      .then((loadedResult) => {
+        if (!isMounted) return;
+        resetToResult(loadedResult);
+        setChaosActive(loadedResult.chaos);
+        if (loadedResult.claims && loadedResult.claims.length > 0) {
+          setSelectedClaimId(`claim-${loadedResult.claims[0].id}`);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load run for replay:", err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [runIdParam]);
 
   const initialMock = React.useMemo(() => getScenarioRunResult(currentScenario), [currentScenario]);
   const runResult = run || initialMock;
@@ -49,13 +79,11 @@ export default function ReviewPage() {
     setSelectedClaimId(id);
 
     if (source === "document") {
-      // Triggered from document: scroll only the corresponding right-margin comment
       const commentEl = document.getElementById(`comment-${id}`);
       if (commentEl) {
         commentEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
     } else {
-      // Triggered from rail: scroll only the corresponding document segment
       const docEl = document.getElementById(`doc-${id}`);
       if (docEl) {
         docEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -129,5 +157,19 @@ export default function ReviewPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function ReviewPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-screen w-screen bg-[#faf8f0] flex items-center justify-center font-mono text-[12px] text-on-surface-variant">
+          Loading VeriTrust Review...
+        </div>
+      }
+    >
+      <ReviewContent />
+    </Suspense>
   );
 }

@@ -1,50 +1,76 @@
 "use client";
 
-import React, { useState } from "react";
-import { PolicyDocument } from "@/types/policy";
+import React from "react";
 
 interface PolicyEditorProps {
-  policy: PolicyDocument;
-  onSaveDraft: (newContent: string) => void;
+  policyName: string;
+  version: string;
+  content: string;
+  onChangeContent: (text: string) => void;
+  onSave: () => void;
   onCancel: () => void;
   isSaving: boolean;
+  isDirty: boolean;
+  saveError?: string | null;
+  saveSuccess?: boolean;
 }
 
 export const PolicyEditor: React.FC<PolicyEditorProps> = ({
-  policy,
-  onSaveDraft,
+  policyName,
+  version,
+  content,
+  onChangeContent,
+  onSave,
   onCancel,
   isSaving,
+  isDirty,
+  saveError = null,
+  saveSuccess = false,
 }) => {
-  const [content, setContent] = useState(policy.markdownContent);
-
   const lines = content.split("\n");
   const lineCount = lines.length;
   const charCount = content.length;
-
-  // Compute simulated next version: e.g. v1.4 -> v1.5
-  const versionParts = policy.version.replace("v", "").split(".");
-  const nextMinor = versionParts.length > 1 ? parseInt(versionParts[1], 10) + 1 : 1;
-  const nextVersion = `v${versionParts[0]}.${nextMinor}`;
 
   return (
     <div className="bg-white p-6 rounded-lg border border-outline-dim shadow-xs flex flex-col gap-4">
       {/* Editor Actions Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-surface-dim">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="font-mono text-[11px] uppercase text-accent-ochre font-semibold">
             Markdown Editor
           </span>
           <span className="text-outline">·</span>
-          <span className="font-mono text-[10px] text-outline">
-            Auto-Chunking Strategy: RecursiveCharacter (chunk_size: 512, overlap: 64)
+          <span className="font-mono text-[11px] text-on-surface font-medium">
+            {policyName} ({version})
           </span>
+          {isDirty && (
+            <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-300 font-mono text-[10px] font-semibold flex items-center gap-1.5 ml-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+              Unsaved changes
+            </span>
+          )}
         </div>
 
         <div className="font-mono text-[10px] text-outline">
           {charCount.toLocaleString()} characters · {lineCount} lines
         </div>
       </div>
+
+      {/* Save Error Banner */}
+      {saveError && (
+        <div className="p-3 bg-red-50/80 border border-red-200 rounded font-mono text-[11px] text-accent-rose flex items-center gap-2">
+          <span className="font-bold">Error saving policy:</span>
+          <span>{saveError}</span>
+        </div>
+      )}
+
+      {/* Save Success Banner */}
+      {saveSuccess && !isDirty && (
+        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded font-mono text-[11px] text-emerald-800 flex items-center gap-2">
+          <span className="font-bold">✓ Policy updated:</span>
+          <span>Active baseline bumped to <strong>{version}</strong> and re-indexed.</span>
+        </div>
+      )}
 
       {/* Code Editor Box with Line Numbers */}
       <div className="w-full flex rounded bg-surface-muted/50 border border-outline-dim overflow-hidden font-mono text-[12px]">
@@ -59,9 +85,10 @@ export const PolicyEditor: React.FC<PolicyEditorProps> = ({
         <textarea
           rows={Math.max(lineCount, 20)}
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={(e) => onChangeContent(e.target.value)}
           spellCheck={false}
           className="w-full p-3 bg-transparent text-on-surface focus:outline-none resize-none leading-6 font-mono text-[12px]"
+          placeholder="Policy markdown content..."
         />
       </div>
 
@@ -71,27 +98,28 @@ export const PolicyEditor: React.FC<PolicyEditorProps> = ({
           <span className="material-symbols-outlined text-[15px] text-accent-ochre leading-none">
             info
           </span>
-          Modifying policy clauses creates a new revision draft ({nextVersion}) and flags dependent reviews.
+          Saving validates front-matter, records an append-only version, re-indexes chunks, and marks past runs stale.
         </span>
 
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="px-3.5 py-1.5 rounded font-sans text-[12px] font-medium bg-surface-muted text-on-surface hover:bg-surface-dim border border-outline-dim transition-colors cursor-pointer"
+            disabled={!isDirty || isSaving}
+            className="px-3.5 py-1.5 rounded font-sans text-[12px] font-medium bg-surface-muted text-on-surface hover:bg-surface-dim border border-outline-dim transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Discard Edits
           </button>
           <button
             type="button"
-            disabled={isSaving}
-            onClick={() => onSaveDraft(content)}
-            className="px-4 py-1.5 rounded font-sans text-[12px] font-medium bg-black text-white hover:bg-zinc-800 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-60"
+            disabled={isSaving || !isDirty}
+            onClick={onSave}
+            className="px-4 py-1.5 rounded font-sans text-[12px] font-medium bg-black text-white hover:bg-zinc-800 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="material-symbols-outlined text-[15px] leading-none">
               {isSaving ? "sync" : "publish"}
             </span>
-            <span>{isSaving ? "Publishing..." : `Publish ${nextVersion} Baseline`}</span>
+            <span>{isSaving ? "Publishing Revision..." : "Save Policy Revision"}</span>
           </button>
         </div>
       </div>

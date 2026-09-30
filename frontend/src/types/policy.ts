@@ -26,3 +26,10 @@ export interface PolicyDocument {
   chunks: PolicyChunk[];
   staleRunsCount?: number;
 }
+
+export type {
+  PolicySummary,
+  PolicyDetail,
+  PolicyUpdateResult,
+} from "./contracts";
+
