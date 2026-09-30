@@ -82,6 +82,7 @@ Answer:"""
 _CORRECT_TEMPLATE = """\
 You are a VeriCorp customer-service agent.
 The rewrite must be ONE sentence that states the corrected policy fact and, if the customer's question contains a number, relates it to that number in the same sentence (e.g. "Opened electronics can be returned within 15 days, so a 20-day-old purchase is outside the return window."). No new facts, no denials, no separate sentences. Do not add markdown.
+If the evidence does not contain an answer to the customer's question, output exactly: CANNOT_ANSWER
 
 Question: {question}
 Previous answer: {draft}
@@ -91,6 +92,7 @@ Evidence:
 {context}
 
 Corrected answer:"""
+
 
 
 # ---------------------------------------------------------------------------
@@ -291,6 +293,8 @@ def correct_draft(
     total_eval_duration = 0
     
     def _is_valid(t: str) -> bool:
+        if t.strip() == "CANNOT_ANSWER":
+            return True
         if _count_sentences(t) != 1:
             return False
         lt = t.lower()

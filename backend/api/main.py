@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.api.routers import ask, runs, metrics, policies, health
+from backend.api.routers import ask, runs, metrics, policies, health, benchmark
 from backend.db.store import get_policy_versions
 
 @asynccontextmanager
@@ -34,3 +34,4 @@ app.include_router(runs.router, prefix="/api")
 app.include_router(metrics.router, prefix="/api")
 app.include_router(policies.router, prefix="/api")
 app.include_router(health.router, prefix="/api")
+app.include_router(benchmark.router, prefix="/api")

@@ -194,16 +194,24 @@ def node_check(state: PipelineState) -> dict:
     judge_tokens = 0
 
     for span in unresolved:
-        try:
-            claim, stats = _judge_mod.judge_claim(span, evidence, question)
-        except Exception:
-            # Fallback to UNSUPPORTED on any judge error
+        if span.text.strip() == "CANNOT_ANSWER":
             claim = Claim(
                 id=span.id, text=span.text, start=span.start, end=span.end,
-                status="UNSUPPORTED", checked_by="llm",
-                reason="Judge error or timeout", evidence=[],
+                status="UNSUPPORTED", checked_by="deterministic",
+                reason="Corrector could not find an answer", evidence=[],
             )
             stats = {"tokens": 0}
+        else:
+            try:
+                claim, stats = _judge_mod.judge_claim(span, evidence, question)
+            except Exception:
+                # Fallback to UNSUPPORTED on any judge error
+                claim = Claim(
+                    id=span.id, text=span.text, start=span.start, end=span.end,
+                    status="UNSUPPORTED", checked_by="llm",
+                    reason="Judge error or timeout", evidence=[],
+                )
+                stats = {"tokens": 0}
         resolved.append(claim)
         judge_tokens += stats.get("tokens", 0)
         _emit(state, "claim_checked", ClaimCheckedEvent(
@@ -548,6 +556,8 @@ def run_pipeline(
         return _handle_error(run_id, question, chaos, t_start, callback,
                              "OLLAMA_DOWN", str(exc))
     except Exception as exc:
+        import traceback
+        traceback.print_exc()
         return _handle_error(run_id, question, chaos, t_start, callback,
                              "INTERNAL", str(exc))
 

@@ -1,0 +1,448 @@
+[
+  {
+    "id": "D01",
+    "category": "direct",
+    "question": "How long do I have to return an eligible item?",
+    "ground_truth": "Refunds are allowed within 15 days of purchase for all eligible items.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "15 days"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "D02",
+    "category": "direct",
+    "question": "What is the restocking fee for opened electronics?",
+    "ground_truth": "A restocking fee of ₹250 applies to opened electronics returns.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹250"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "D03",
+    "category": "direct",
+    "question": "How much does return shipping cost for non-defective returns?",
+    "ground_truth": "Return shipping costs ₹99 for non-defective change-of-mind returns.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹99"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "D04",
+    "category": "direct",
+    "question": "How long does standard shipping take?",
+    "ground_truth": "Standard shipping takes between 3 to 5 business days for delivery.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "3 to 5 business days"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "D05",
+    "category": "direct",
+    "question": "What is the standard shipping fee for orders below the threshold?",
+    "ground_truth": "Standard shipping fee is ₹99 for orders below the free-shipping threshold.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹99"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "D06",
+    "category": "direct",
+    "question": "What is the fee for same-day delivery?",
+    "ground_truth": "Same-day delivery carries an additional fee of ₹299 per order.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹299"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "D07",
+    "category": "direct",
+    "question": "What is the warranty period for laptops?",
+    "ground_truth": "All VeriCorp laptops and desktop computers include a standard 2-year manufacturer warranty.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "2-year"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "D08",
+    "category": "direct",
+    "question": "What is the warranty for cables and chargers?",
+    "ground_truth": "Smart accessories such as cables, chargers, and adapters carry a 6-month limited warranty.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "6-month"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "D09",
+    "category": "direct",
+    "question": "What is the cancellation window for new orders?",
+    "ground_truth": "Orders can be cancelled freely within 2 hours of placement through the customer account.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "2 hours"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "D10",
+    "category": "direct",
+    "question": "What is the return transit processing fee for refused deliveries?",
+    "ground_truth": "Packages refused at delivery incur a return transit processing fee of ₹99 deducted from the refund.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹99"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "P01",
+    "category": "paraphrased",
+    "question": "I changed my mind about the purchase, what is the charge for sending it back?",
+    "ground_truth": "Return shipping costs ₹99 for non-defective change-of-mind returns.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹99"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "P02",
+    "category": "paraphrased",
+    "question": "My order is above Rs 999. Do I have to pay for regular delivery?",
+    "ground_truth": "Orders with a total value of ₹999 or more qualify for free standard shipping.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "free standard shipping"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "P03",
+    "category": "paraphrased",
+    "question": "Can I cancel my subscription services whenever I want?",
+    "ground_truth": "Subscription services can be cancelled up to 48 hours before the monthly renewal date.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "48 hours"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "P04",
+    "category": "paraphrased",
+    "question": "How quickly do you resolve emails?",
+    "ground_truth": "Email inquiries receive a first response within 24 hours of ticket submission.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "24 hours"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "P05",
+    "category": "paraphrased",
+    "question": "Can I pay using my bank net banking?",
+    "ground_truth": "Net banking is supported across all major Indian scheduled banks.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "Net banking is supported"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "P06",
+    "category": "paraphrased",
+    "question": "If my payment fails, how long until I get the money back?",
+    "ground_truth": "Failed payment debits are automatically reversed by the payment gateway within 5 business days.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "5 business days"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "P07",
+    "category": "paraphrased",
+    "question": "How long will it take to repair my broken laptop under warranty?",
+    "ground_truth": "Repaired or replaced items are dispatched within 10 business days of arriving at the service center.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "10 business days"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "P08",
+    "category": "paraphrased",
+    "question": "Do I need to pay for setup guides and tutorials?",
+    "ground_truth": "Self-service setup guides and video tutorials are available free of charge on the support portal.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "free of charge"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "M01",
+    "category": "multi_part",
+    "question": "How long do standard and express shipping take?",
+    "ground_truth": "Standard shipping takes between 3 to 5 business days and Express shipping guarantees delivery within 1 to 2 business days.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "3 to 5 business days",
+      "1 to 2 business days"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "M02",
+    "category": "multi_part",
+    "question": "What are the standard shipping fee and express shipping fee?",
+    "ground_truth": "Standard shipping fee is ₹99 for orders below the free-shipping threshold and Express shipping costs a flat fee of ₹199.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹99",
+      "₹199"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "M03",
+    "category": "multi_part",
+    "question": "How long is the warranty for laptops and smart accessories?",
+    "ground_truth": "Laptops include a standard 2-year manufacturer warranty, and smart accessories carry a 6-month limited warranty.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "2-year",
+      "6-month"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "M04",
+    "category": "multi_part",
+    "question": "What is the return window for general items versus opened electronics?",
+    "ground_truth": "Refunds are allowed within 15 days of purchase for eligible items, and opened electronics can be returned within 15 days of delivery.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "15 days of purchase",
+      "15 days of delivery"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "M05",
+    "category": "multi_part",
+    "question": "When can I cancel an order freely versus a subscription?",
+    "ground_truth": "Orders can be cancelled freely within 2 hours of placement, and subscriptions can be cancelled up to 48 hours before renewal.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "2 hours",
+      "48 hours"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "M06",
+    "category": "multi_part",
+    "question": "How much does a COD order and a refused delivery cost?",
+    "ground_truth": "Cash on delivery orders incur a convenience handling fee of ₹49, and refused deliveries incur a return transit processing fee of ₹99.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹49",
+      "₹99"
+    ],
+    "forbidden_facts": []
+  },
+  {
+    "id": "F01",
+    "category": "false_premise",
+    "question": "Can I return opened electronics within 30 days?",
+    "ground_truth": "Opened electronics can be returned within 15 days of delivery, not 30 days.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "15 days"
+    ],
+    "forbidden_facts": [
+      "30 days"
+    ]
+  },
+  {
+    "id": "F02",
+    "category": "false_premise",
+    "question": "Is the restocking fee for opened electronics ₹500?",
+    "ground_truth": "A restocking fee of ₹250 applies to opened electronics returns.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹250"
+    ],
+    "forbidden_facts": [
+      "₹500"
+    ]
+  },
+  {
+    "id": "F03",
+    "category": "false_premise",
+    "question": "Does express shipping take 5 business days?",
+    "ground_truth": "Express shipping guarantees delivery within 1 to 2 business days.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "1 to 2 business days"
+    ],
+    "forbidden_facts": [
+      "5 business days"
+    ]
+  },
+  {
+    "id": "F04",
+    "category": "false_premise",
+    "question": "Does same-day delivery cost ₹500?",
+    "ground_truth": "Same-day delivery carries an additional fee of ₹299 per order.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹299"
+    ],
+    "forbidden_facts": [
+      "₹500"
+    ]
+  },
+  {
+    "id": "F05",
+    "category": "false_premise",
+    "question": "Can I cancel my subscription 2 hours before renewal?",
+    "ground_truth": "Subscription services can be cancelled up to 48 hours before the monthly renewal date.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "48 hours"
+    ],
+    "forbidden_facts": [
+      "2 hours"
+    ]
+  },
+  {
+    "id": "F06",
+    "category": "false_premise",
+    "question": "Do laptops have a 5-year warranty?",
+    "ground_truth": "All VeriCorp laptops and desktop computers include a standard 2-year manufacturer warranty.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "2-year"
+    ],
+    "forbidden_facts": [
+      "5-year"
+    ]
+  },
+  {
+    "id": "F07",
+    "category": "false_premise",
+    "question": "Is cash on delivery available for orders up to ₹50,000?",
+    "ground_truth": "Cash on delivery is available for orders with a total value up to ₹10,000.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹10,000"
+    ],
+    "forbidden_facts": [
+      "₹50,000"
+    ]
+  },
+  {
+    "id": "F08",
+    "category": "false_premise",
+    "question": "Does paid professional home installation cost ₹1500?",
+    "ground_truth": "Paid professional home installation is available for televisions and home theater systems at ₹799.",
+    "expected_behavior": "ANSWER",
+    "expected_facts": [
+      "₹799"
+    ],
+    "forbidden_facts": [
+      "₹1500"
+    ]
+  },
+  {
+    "id": "U01",
+    "category": "unanswerable",
+    "question": "Do you offer drone delivery for small packages?",
+    "ground_truth": "ABSTAIN",
+    "expected_behavior": "ABSTAIN",
+    "expected_facts": [],
+    "forbidden_facts": []
+  },
+  {
+    "id": "U02",
+    "category": "unanswerable",
+    "question": "Who is the CEO of VeriCorp?",
+    "ground_truth": "ABSTAIN",
+    "expected_behavior": "ABSTAIN",
+    "expected_facts": [],
+    "forbidden_facts": []
+  },
+  {
+    "id": "U03",
+    "category": "unanswerable",
+    "question": "Can I invest in VeriCorp stock?",
+    "ground_truth": "ABSTAIN",
+    "expected_behavior": "ABSTAIN",
+    "expected_facts": [],
+    "forbidden_facts": []
+  },
+  {
+    "id": "U04",
+    "category": "unanswerable",
+    "question": "Are your warehouses solar powered?",
+    "ground_truth": "ABSTAIN",
+    "expected_behavior": "ABSTAIN",
+    "expected_facts": [],
+    "forbidden_facts": []
+  },
+  {
+    "id": "U05",
+    "category": "unanswerable",
+    "question": "Do you sell groceries?",
+    "ground_truth": "ABSTAIN",
+    "expected_behavior": "ABSTAIN",
+    "expected_facts": [],
+    "forbidden_facts": []
+  },
+  {
+    "id": "U06",
+    "category": "unanswerable",
+    "question": "What is the employee dress code?",
+    "ground_truth": "ABSTAIN",
+    "expected_behavior": "ABSTAIN",
+    "expected_facts": [],
+    "forbidden_facts": []
+  },
+  {
+    "id": "U07",
+    "category": "unanswerable",
+    "question": "Are pets allowed in your offline stores?",
+    "ground_truth": "ABSTAIN",
+    "expected_behavior": "ABSTAIN",
+    "expected_facts": [],
+    "forbidden_facts": []
+  },
+  {
+    "id": "U08",
+    "category": "unanswerable",
+    "question": "Do you have a trade-in program for old smartphones?",
+    "ground_truth": "ABSTAIN",
+    "expected_behavior": "ABSTAIN",
+    "expected_facts": [],
+    "forbidden_facts": []
+  }
+]

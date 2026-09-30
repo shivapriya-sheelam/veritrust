@@ -195,3 +195,32 @@ def test_health_ollama_down():
     with patch("httpx.AsyncClient.get", side_effect=Exception("Connection refused")):
         resp = client.get("/api/health")
         assert resp.json()["ollama"] is False
+
+def test_cannot_answer_abstains():
+    from backend.graph.pipeline import run_pipeline
+    with patch("backend.agents.maker.make_draft", return_value=("fake", {"maker": 10})), \
+         patch("backend.agents.splitter.split_claims") as split_claims_mock, \
+         patch("backend.agents.checker.deterministic_check") as check_mock, \
+         patch("backend.agents.judge.judge_claim") as judge_mock, \
+         patch("backend.agents.maker.correct_draft", return_value=("CANNOT_ANSWER", {"maker": 10})):
+         
+         from backend.contracts import Claim, ClaimSpan
+         
+         def fake_split(text):
+             return [ClaimSpan(id=0, text=text, start=0, end=len(text))]
+             
+         split_claims_mock.side_effect = fake_split
+         
+         def fake_check(span, ev, q):
+             if span.text == "fake":
+                 return Claim(id=span.id, text=span.text, start=span.start, end=span.end, status="CONTRADICTED", checked_by="deterministic", reason="", evidence=[])
+             return None
+             
+         check_mock.side_effect = fake_check
+         
+         def fake_callback(ev, data): pass
+         
+         res = run_pipeline("q", False, fake_callback)
+         assert res.final_status == "ABSTAINED"
+         assert res.abstain_reason == "UNSUPPORTED"
+         assert res.final_answer == ABSTAIN_MESSAGE
