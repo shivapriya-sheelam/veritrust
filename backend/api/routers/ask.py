@@ -7,7 +7,7 @@ from typing import Any
 
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 
 from backend.graph.run import run_pipeline
 from backend.db.store import save_run
@@ -17,7 +17,7 @@ router = APIRouter()
 is_busy = False
 
 class AskRequest(BaseModel):
-    question: str
+    question: constr(strip_whitespace=True, min_length=1, max_length=2000)
     chaos: bool = False
 
 async def event_generator(req: AskRequest, request: Request):

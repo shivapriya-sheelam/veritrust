@@ -224,3 +224,16 @@ def test_cannot_answer_abstains():
          assert res.final_status == "ABSTAINED"
          assert res.abstain_reason == "UNSUPPORTED"
          assert res.final_answer == ABSTAIN_MESSAGE
+
+
+def test_ask_validation_empty_and_whitespace():
+    resp_empty = client.post("/api/ask", json={"question": ""})
+    assert resp_empty.status_code == 422
+
+    resp_whitespace = client.post("/api/ask", json={"question": "   "})
+    assert resp_whitespace.status_code == 422
+
+
+def test_ask_validation_max_length():
+    resp_too_long = client.post("/api/ask", json={"question": "a" * 2001})
+    assert resp_too_long.status_code == 422
