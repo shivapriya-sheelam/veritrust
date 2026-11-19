@@ -6,9 +6,17 @@ import { LedgerRunRecord } from "@/types/ledger";
 
 interface RunLogTableProps {
   runs: LedgerRunRecord[];
+  currentPage?: number;
+  totalRuns?: number;
+  onPageChange?: (page: number) => void;
 }
 
-export const RunLogTable: React.FC<RunLogTableProps> = ({ runs }) => {
+export const RunLogTable: React.FC<RunLogTableProps> = ({ 
+  runs,
+  currentPage = 1,
+  totalRuns = 0,
+  onPageChange
+}) => {
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
 
   const toggleRow = (id: string) => {
@@ -229,45 +237,31 @@ export const RunLogTable: React.FC<RunLogTableProps> = ({ runs }) => {
       {/* Table Pagination / Audit Footnote */}
       <div className="w-full pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-on-surface-variant">
         <div>
-          Showing <span className="text-on-surface font-semibold">1 - {runs.length}</span> of 142 logged
+          Showing <span className="text-on-surface font-semibold">{(currentPage - 1) * 20 + (runs.length > 0 ? 1 : 0)} - {Math.min(currentPage * 20, totalRuns)}</span> of {totalRuns} logged
           transactions
         </div>
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className="px-2.5 py-1 rounded border border-outline-dim text-outline cursor-not-allowed"
-            disabled
+            className={`px-2.5 py-1 rounded border border-outline-dim ${currentPage === 1 ? 'text-outline cursor-not-allowed' : 'text-on-surface hover:bg-surface-dim transition-colors'}`}
+            disabled={currentPage === 1}
+            onClick={() => onPageChange && onPageChange(currentPage - 1)}
           >
             Previous
           </button>
+          
           <button
             type="button"
             className="px-2.5 py-1 rounded bg-black text-white font-medium shadow-xs"
           >
-            1
+            {currentPage}
           </button>
+          
           <button
             type="button"
-            className="px-2.5 py-1 rounded border border-outline-dim text-on-surface hover:bg-surface-dim transition-colors"
-          >
-            2
-          </button>
-          <button
-            type="button"
-            className="px-2.5 py-1 rounded border border-outline-dim text-on-surface hover:bg-surface-dim transition-colors"
-          >
-            3
-          </button>
-          <span className="px-1 text-outline">…</span>
-          <button
-            type="button"
-            className="px-2.5 py-1 rounded border border-outline-dim text-on-surface hover:bg-surface-dim transition-colors"
-          >
-            21
-          </button>
-          <button
-            type="button"
-            className="px-2.5 py-1 rounded border border-outline-dim text-on-surface hover:bg-surface-dim transition-colors"
+            className={`px-2.5 py-1 rounded border border-outline-dim ${currentPage * 20 >= totalRuns ? 'text-outline cursor-not-allowed' : 'text-on-surface hover:bg-surface-dim transition-colors'}`}
+            disabled={currentPage * 20 >= totalRuns}
+            onClick={() => onPageChange && onPageChange(currentPage + 1)}
           >
             Next
           </button>

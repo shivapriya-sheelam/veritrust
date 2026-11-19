@@ -12,17 +12,46 @@ export default function LedgerPage() {
   const [runs, setRuns] = useState<LedgerRunRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 20;
 
   const [isGauntletRunning, setIsGauntletRunning] = useState<boolean>(false);
   const [gauntletStatus, setGauntletStatus] = useState<string | null>(null);
 
-  const loadData = async () => {
+  const loadData = async (page: number = 1) => {
     setIsLoading(true);
     setError(null);
     try {
-      const [m, r] = await Promise.all([fetchMetrics(), fetchRuns(20)]);
-      setSummary(m);
-      setRuns(r);
+      const [m, r] = await Promise.all([fetchMetrics(), fetchRuns(limit, (page - 1) * limit)]);
+      
+      const isRaw = m.answers_checked !== undefined;
+      const summaryMapped: any = isRaw ? {
+        isMockData: false,
+        totalChecked: m.answers_checked,
+        wrongDrafts: m.wrong_drafts,
+        fixedCount: m.corrected,
+        refusedCount: m.abstained,
+        caption: `Measured on ${m.answers_checked} verified runs.`,
+        drift: m.drift,
+        chaos_runs: m.chaos_runs
+      } : m;
+
+      setSummary(summaryMapped);
+      
+      const runsMapped: LedgerRunRecord[] = (r && r.length > 0 && r[0].run_id) ? r.map((run: any) => ({
+        id: run.run_id,
+        question: run.question,
+        timestamp: run.created_at,
+        status: run.final_status === "DELIVERED" ? "PASSED" : (run.final_status === "ABSTAINED" ? "REFUSED" : run.final_status),
+        statusLabel: run.final_status === "CORRECTED" ? "Corrected" : run.final_status === "DELIVERED" ? "Passed (1st pass)" : "Refused (Abstain)",
+        isSimulated: run.chaos,
+        actionLabel: "Inspect run",
+        rawProposition: { text: "Raw text not available in summary view. Open full run." },
+        reconciledRedline: { text: "Redline not available in summary view." }
+      })) : r;
+
+      setRuns(runsMapped);
+      setCurrentPage(page);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load ledger data");
     } finally {
@@ -31,7 +60,7 @@ export default function LedgerPage() {
   };
 
   useEffect(() => {
-    loadData();
+    loadData(1);
   }, []);
 
   const handleRunGauntlet = async () => {
@@ -158,7 +187,12 @@ export default function LedgerPage() {
                   No runs found in ledger.
                 </div>
               ) : (
-                <RunLogTable runs={runs} />
+                <RunLogTable 
+                  runs={runs} 
+                  currentPage={currentPage}
+                  totalRuns={summary.totalChecked + ((summary as any).chaos_runs || 0)}
+                  onPageChange={loadData}
+                />
               )}
             </>
           )}

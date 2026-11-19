@@ -24,21 +24,32 @@ export default function PoliciesPage() {
     let mounted = true;
     setIsLoading(true);
     fetchPolicies()
-      .then((data) => {
+      .then(async (data) => {
         if (!mounted) return;
-        const mapped = data.map((d: any) => ({
+        const mapped: PolicyDocument[] = data.map((d: any) => ({
           id: d.name,
+          name: d.name,
           title: d.name.replace(".md", "").replace("_", " "),
           version: d.version,
           updatedAt: d.updated_at || new Date().toISOString(),
-          authorName: "System",
-          authorRole: "Engine",
-          authorAvatarUrl: "",
-          markdownContent: d.text || "Loading content..." // We will lazy load or they return it? The PRD says /api/policies returns just name/version. But we need text for the UI. Wait, /api/policies doesn't return text. Let's just use what we get. We'll fetch text when selected.
+          summary: d.summary || "Policy specifications",
+          subtitle: "Active",
+          reviewsGroundedCount: 0,
+          chunksCount: 0,
+          chunks: [],
+          markdownContent: d.text || "Loading content..."
         }));
         setPolicies(mapped);
         if (mapped.length > 0) {
           setSelectedPolicyId(mapped[0].id);
+          // Fetch the full content for the first policy
+          try {
+             const { fetchPolicyByName } = await import("@/lib/api");
+             const fullPolicy = await fetchPolicyByName(mapped[0].id);
+             setPolicies(prev => prev.map(p => p.id === mapped[0].id ? { ...p, markdownContent: fullPolicy.text } : p));
+          } catch (err) {
+             console.error("Failed to fetch initial policy content", err);
+          }
         }
       })
       .catch((err) => {
@@ -52,9 +63,20 @@ export default function PoliciesPage() {
 
   const selectedPolicy = policies.find((p) => p.id === selectedPolicyId) || policies[0];
 
-  const handleSelectPolicy = (id: string) => {
+  const handleSelectPolicy = async (id: string) => {
     setSelectedPolicyId(id);
     setMode("view");
+    
+    const pol = policies.find(p => p.id === id);
+    if (pol && pol.markdownContent === "Loading content...") {
+      try {
+        const { fetchPolicyByName } = await import("@/lib/api");
+        const fullPol = await fetchPolicyByName(id);
+        setPolicies(prev => prev.map(p => p.id === id ? { ...p, markdownContent: fullPol.text } : p));
+      } catch (err) {
+        console.error("Failed to load policy content", err);
+      }
+    }
   };
 
   const handleSaveDraft = async (newContent: string) => {
