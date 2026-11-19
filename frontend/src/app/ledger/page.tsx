@@ -114,7 +114,7 @@ export default function LedgerPage() {
             <div className="p-6 bg-rose-50 text-rose-700 border border-rose-200 rounded">
               {error}
               <div className="mt-2">
-                <button onClick={loadData} className="underline text-[13px]">Retry</button>
+                <button onClick={() => loadData(1)} className="underline text-[13px]">Retry</button>
               </div>
             </div>
           ) : !summary ? (
